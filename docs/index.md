@@ -11,7 +11,7 @@ Funktionen und Inhalte:
 Konzept
 - Nutzer wählen ein Thema oder starten ein zufälliges Quiz.
 - Jede Frage bietet mehrere Antwortmöglichkeiten, von denen nur eine korrekt ist.
-  - Richtig beantwortete Fragen bringen Punkte, die in eine dynamische Rangliste einfließen.
+- Richtig beantwortete Fragen bringen Punkte, die in eine dynamische Rangliste einfließen.
 
 
 Entwickelt von Malik Ceesay und Yazid Heimur
