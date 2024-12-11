@@ -1,10 +1,11 @@
-# quiz_logic.py
-
 import random
 from questions import questions
 
 class QuizLogic:
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.score = 0
         self.qn = 0
         self.correct = 0
@@ -27,9 +28,3 @@ class QuizLogic:
 
     def get_score(self):
         return self.correct, len(self.questions)
-
-    def reset(self):
-        self.score = 0
-        self.qn = 0
-        self.correct = 0
-        random.shuffle(self.questions)

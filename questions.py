@@ -1,5 +1,3 @@
-# questions.py
-
 questions = [
     {
         "frage": "Welche Programmiersprache wird häufig für Data Science verwendet?",
