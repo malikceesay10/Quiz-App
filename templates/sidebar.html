@@ -1,0 +1,16 @@
+<div class="dashboard-sidebar">
+    <div class="sidebar-header">
+        <h2>Quiz App</h2>
+        <p class="user-welcome">Willkommen, {{ username }}!</p>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('index') }}" class="nav-item {{ 'active' if request.endpoint in ['index', None] }}">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('logout') }}" class="nav-item logout-btn">
+            <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
+            <span>Ausloggen</span>
+        </a>
+    </nav>
+</div>
