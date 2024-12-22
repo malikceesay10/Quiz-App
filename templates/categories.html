@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kategorien - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        {% include 'sidebar.html' %}
+
+        <div class="main-content">
+            <div class="categories-header">
+                <h1>Wähle eine Kategorie</h1>
+                <p class="subtitle">Teste dein Wissen in verschiedenen Bereichen</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            this.style.opacity = '0.7';
+            document.querySelectorAll('.category-card').forEach(c => {
+                c.style.pointerEvents = 'none';
+            });
+        });
+    });
+    </script>
+</body>
+</html>
