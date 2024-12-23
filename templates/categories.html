@@ -18,6 +18,43 @@
                 <h1>Wähle eine Kategorie</h1>
                 <p class="subtitle">Teste dein Wissen in verschiedenen Bereichen</p>
             </div>
+
+            <div class="categories-grid">
+                {% if mode != 'all_questions' %}
+                    <a href="{{ url_for('start_quiz', category='zufällige fragen') }}" class="category-card">
+                        <div class="category-icon">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <h2>Zufällige Fragen</h2>
+                        <p>Gemischte Fragen aus allen Kategorien</p>
+                    </a>
+                {% endif %}
+
+                {% for category in ['geschichte', 'wissenschaft', 'geographie', 'sport', 'musik', 'film'] %}
+                    {% set target_url = url_for('show_category_questions', category=category) if mode == 'all_questions' else url_for('start_quiz', category=category) %}
+                    <a href="{{ target_url }}" class="category-card">
+                        <div class="category-icon">
+                            <i class="fas fa-{{ {
+                                'geschichte': 'monument',
+                                'wissenschaft': 'flask',
+                                'geographie': 'globe-americas',
+                                'sport': 'football-ball',
+                                'musik': 'music',
+                                'film': 'film'
+                            }[category] }}"></i>
+                        </div>
+                        <h2>{{ category|capitalize }}</h2>
+                        <p>{{ {
+                            'geschichte': 'Teste dein historisches Wissen',
+                            'wissenschaft': 'Naturwissenschaftliche Fragen',
+                            'geographie': 'Länder, Städte und mehr',
+                            'sport': 'Alles rund um Sport',
+                            'musik': 'Von Klassik bis Pop',
+                            'film': 'Filme, Serien und Stars'
+                        }[category] }}</p>
+                    </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
