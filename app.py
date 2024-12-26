@@ -10,6 +10,14 @@ app.permanent_session_lifetime = timedelta(days=7)
 db = SQLAlchemy(app)
 
 
+def login_required(f):
+    def wrapper(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -125,6 +133,102 @@ def start_quiz(category):
         'category': category
     }
     return redirect(url_for('show_question'))
+
+@app.route('/quiz/question', methods=['GET', 'POST'])
+@login_required
+def show_question():
+    quiz_data = session['quiz']
+    if quiz_data['current'] >= len(quiz_data['questions']):
+        return redirect(url_for('quiz_result'))
+    
+    question = Quiz.query.get(quiz_data['questions'][quiz_data['current']])
+    answers = [
+        question.correct_answer,
+        question.wrong_answer1,
+        question.wrong_answer2,
+        question.wrong_answer3
+    ]
+    random.shuffle(answers)
+    
+    return render_template('question.html', 
+                         question=question,
+                         answers=answers,
+                         current=quiz_data['current'] + 1,
+                         total=len(quiz_data['questions']))
+
+@app.route('/quiz/answer', methods=['POST'])
+@login_required
+def submit_answer():
+    quiz_data = session['quiz']
+    answer = request.form.get('answer')
+    question = Quiz.query.get(quiz_data['questions'][quiz_data['current']])
+    
+    quiz_data['answers'].append({
+        'question': question.question,
+        'user_answer': answer,
+        'correct_answer': question.correct_answer,
+        'is_correct': answer == question.correct_answer
+    })
+    
+    if answer == question.correct_answer:
+        quiz_data['correct'] += 1
+    
+    quiz_data['current'] += 1
+    session['quiz'] = quiz_data
+
+    if quiz_data['current'] >= len(quiz_data['questions']):
+        return redirect(url_for('quiz_result'))
+    
+    return redirect(url_for('show_question'))
+
+@app.route('/quiz/result')
+@login_required
+def quiz_result():
+    quiz_data = session.get('quiz')
+    if not quiz_data:
+        return redirect(url_for('categories'))
+    
+    score = quiz_data['correct']
+    total = len(quiz_data['questions'])
+    answers = quiz_data['answers']
+    category = quiz_data.get('category', 'unbekannt')
+    
+    user = get_current_user()
+    if user is None:
+        return redirect(url_for('login'))
+    
+    result = QuizResult(
+        user_id=user.id, 
+        score=score, 
+        category=category,
+        answers=json.dumps(answers)
+    )
+    db.session.add(result)
+    db.session.commit()
+    
+    session.pop('quiz', None)
+    
+    return render_template('quiz_result.html', 
+                         score=score, 
+                         total=total,
+                         answers=answers)
+
+@app.route('/result/<int:result_id>')
+@login_required
+def show_result(result_id):
+    result = QuizResult.query.get_or_404(result_id)
+    user = get_current_user()
+    
+    if result.user_id != user.id:
+        flash('Zugriff verweigert')
+        return redirect(url_for('index'))
+        
+    answers = json.loads(result.answers) if result.answers else []
+    
+    return render_template('quiz_result.html',
+                         score=result.score,
+                         total=len(answers),
+                         answers=answers)
 
 if __name__ == '__main__':
     with app.app_context():
