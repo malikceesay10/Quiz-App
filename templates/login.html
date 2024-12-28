@@ -1,48 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Quiz App - Willkommen</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Login - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="landing-container">
-        <div class="content-wrapper">
-            <div class="hero-section">
-                <img src="{{ url_for('static', filename='images/quiz-logo.png') }}" alt="Quiz App Logo" class="app-logo">
-                <h1>Willkommen bei der Quiz App</h1>
-                <p class="hero-subtitle">Teste dein Wissen, fordere deine Freunde heraus und lerne Neues!</p>
+    <div class="auth-container">
+        <a href="{{ url_for('index') }}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            <span>Zurück</span>
+        </a>
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>Willkommen zurück!</h1>
+                <p class="auth-subtitle">Melde dich an und starte dein Quiz-Abenteuer</p>
             </div>
-
-            <div class="features-section">
-                {% set features = [
-                    ('brain', 'Vielfältige Kategorien', 'Von Musik bis Wissenschaft'),
-                    ('users', 'Multiplayer', 'Spiel mit deinen Freunden'),
-                    ('chart-line', 'Fortschritt', 'Verfolge deine Entwicklung anhand detaillierter Statistiken')
-                ] %}
-
-                {% for icon, title, desc in features %}
-                    <div class="feature-item">
-                        <i class="fas fa-{{ icon }}"></i>
-                        <h3>{{ title }}</h3>
-                        <p>{{ desc }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-
-            {% set buttons = [
-                ('login', 'sign-in-alt', 'Einloggen'),
-                ('register', 'user-plus', 'Registrieren')
-            ] %}
-            
-            <div class="auth-buttons">
-                {% for route, icon, text in buttons %}
-                    <a href="{{ url_for(route) }}" class="button {{ route }}-btn">
-                        <i class="fas fa-{{ icon }}"></i>
-                        <span>{{ text }}</span>
-                    </a>
-                {% endfor %}
+            <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Benutzername" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Passwort" required>
+                </div>
+                <button type="submit" class="auth-button">Einloggen</button>
+            </form>
+            <div class="auth-footer">
+                <p>Noch kein Konto? <a href="{{ url_for('register') }}" class="auth-link">Hier registrieren</a></p>
             </div>
         </div>
     </div>
