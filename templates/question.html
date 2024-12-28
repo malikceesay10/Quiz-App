@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Frage - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+</head>
+<body class="quiz-body">
+    <div class="quiz-screen">
+        <div class="quiz-top">
+            <div class="quiz-header">
+                <div class="question-counter">Frage {{ current }} von {{ total }}</div>
+                <div class="timer" id="timer">10</div>
+            </div>
+            <div class="question-text">
+                <h2>{{ question.question }}</h2>
+            </div>
+        </div>
+
+        <div class="quiz-bottom">
+            <form action="{{ url_for('submit_single_answer', question_id=question.id) if single_question else url_for('submit_answer') }}" 
+                  method="POST" 
+                  class="answers-grid" 
+                  id="quiz-form">
+                <div class="answers-container">
+                    {% for answer in answers %}
+                        <div class="answer-box">
+                            <input type="radio" 
+                                   name="answer" 
+                                   id="answer{{ loop.index }}" 
+                                   value="{{ answer }}">
+                            <label for="answer{{ loop.index }}" class="answer-label">
+                                {{ answer }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="next-button" id="next-btn">Nächste Frage</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const timerElement = document.getElementById('timer');
+        const form = document.getElementById('quiz-form');
+        const nextBtn = document.getElementById('next-btn');
+        const radioInputs = document.querySelectorAll('input[type="radio"]');
+        let timeLeft = 10;
+
+        setInterval(() => {
+            if (timeLeft > 0) {
+                timerElement.textContent = --timeLeft;
+            } else if (timeLeft === 0) {
+                timerElement.textContent = 'Zeit abgelaufen!';
+                radioInputs.forEach(input => input.disabled = true);
+                nextBtn.disabled = false;
+                timeLeft = -1;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

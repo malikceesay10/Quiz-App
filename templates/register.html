@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrierung - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <a href="{{ url_for('index') }}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            <span>Zurück</span>
+        </a>
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>Registrierung</h1>
+                <p class="auth-subtitle">Erstelle dein Konto und starte dein Quiz-Abenteuer</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Benutzername" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="firstname" placeholder="Vorname" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="lastname" placeholder="Nachname" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Passwort" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password2" placeholder="Passwort wiederholen" required>
+                </div>
+                <button type="submit" class="auth-button">Registrieren</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Bereits registriert? <a href="{{ url_for('login') }}" class="auth-link">Hier einloggen</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

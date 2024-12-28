@@ -1,0 +1,124 @@
+@import 'base.css';
+@import 'components.css';
+
+.dashboard-body {
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 2rem;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+    color: #1a73e8;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header .subtitle {
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.user-welcome {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+.category-icon[data-category="Geschichte"] i,
+.result-category[data-category="Geschichte"] i { color: #d32f2f; }
+.category-icon[data-category="Wissenschaft"] i,
+.result-category[data-category="Wissenschaft"] i { color: #1976d2; }
+.category-icon[data-category="Geographie"] i,
+.result-category[data-category="Geographie"] i { color: #388e3c; }
+.category-icon[data-category="Sport"] i,
+.result-category[data-category="Sport"] i { color: #f57c00; }
+.category-icon[data-category="Musik"] i,
+.result-category[data-category="Musik"] i { color: #8e24aa; }
+.category-icon[data-category="Film"] i,
+.result-category[data-category="Film"] i { color: #c2185b; }
+.category-icon[data-category="Zufällige"] i,
+.result-category[data-category="Zufällige"] i { color: #7952b3; }
+
+.progress[data-category="Geschichte"] { background: #d32f2f; }
+.progress[data-category="Wissenschaft"] { background: #1976d2; }
+.progress[data-category="Geographie"] { background: #388e3c; }
+.progress[data-category="Sport"] { background: #f57c00; }
+.progress[data-category="Musik"] { background: #8e24aa; }
+.progress[data-category="Film"] { background: #c2185b; }
+.progress[data-category="Zufällige"] { background: #7952b3; }
+
+.quick-start {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    color: #333;
+}
+
+.quick-start h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.quick-start p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.quick-start .subtitle {
+    opacity: 0.9;
+    margin: 10px 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.stat-card i {
+    font-size: 24px;
+    color: #1a73e8;
+    margin-right: 12px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
