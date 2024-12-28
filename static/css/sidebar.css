@@ -1,6 +1,6 @@
 .dashboard-sidebar {
     width: 250px;
-    background: linear-gradient(180deg, #1a73e8 0%, #1557b0 100%);
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
     color: white;
     padding: 2rem 0;
     position: fixed;
@@ -10,10 +10,22 @@
     box-shadow: 4px 0 10px rgba(0,0,0,0.1);
 }
 
-.nav-item.active {
-    background-color: rgba(255, 255, 255, 0.2) !important; /* Add !important if needed */
-    color: white;
-    font-weight: 500;
+.logo-container,
+.sidebar-header,
+.sidebar-header h2,
+.user-welcome {
+    text-align: center;
+}
+
+.logo-container {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.app-logo {
+    width: 100%;
+    height: auto;
+    margin-bottom: 0.5rem;
 }
 
 .sidebar-header {
@@ -48,15 +60,10 @@
     transform: translateX(5px);
 }
 
-.nav-item:active {
-    background-color: rgba(255, 255, 255, 0.2);
-    font-weight: bold;
-}
-
+.nav-item:active,
 .nav-item.active {
     background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 500;
+    font-weight: bold;
 }
 
 .nav-icon {
@@ -67,23 +74,9 @@
 
 .logout-btn {
     margin-top: auto;
-    color: #fff;
+    color: white;
 }
 
 .logout-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-}
-
-@media (max-width: 1024px) {
-    .dashboard-sidebar {
-        width: 200px;
-    }
-}
-
-@media (max-width: 768px) {
-    .dashboard-sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
 }
