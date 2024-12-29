@@ -15,10 +15,77 @@
         <div class="main-content">
             <div class="dashboard-header">
                 <h1>Dashboard</h1>
+                <p class="subtitle">Willkommen zurück! Hier findest du eine Übersicht deiner Quiz-Aktivitäten.</p>
             </div>
 
             <div class="dashboard-grid">
-                <div class="grid-card">
+
+                <div class="grid-card quick-start">
+                    <h2><i class="fas fa-play-circle"></i> Schnellstart</h2>
+                    <p>Bereit für eine neue Herausforderung?</p>
+                    <p class="subtitle">Teste dein Wissen in verschiedenen Kategorien!</p>
+                    <a href="{{ url_for('categories') }}" class="button start-button">
+                        <i class="fas fa-play"></i> Quiz starten
+                    </a>
+                </div>
+
+                <div class="grid-card top-categories">
+                    <h2><i class="fas fa-chart-bar"></i> Top Kategorien</h2>
+                    <div class="category-progress-list">
+                        {% if top_categories %}
+                            {% set category_icons = {
+                                'Geschichte': 'monument',
+                                'Wissenschaft': 'flask',
+                                'Geographie': 'globe-americas',
+                                'Sport': 'football-ball',
+                                'Musik': 'music',
+                                'Film': 'film',
+                                'default': 'random'
+                            } %}
+                            
+                            {% for category in top_categories %}
+                            <div class="category-progress">
+                                <div class="category-info">
+                                    <div class="category-icon" data-category="{{ category.name }}">
+                                        <i class="fas fa-{{ category_icons.get(category.name, category_icons.default) }}"></i>
+                                    </div>
+                                    <span class="category-name">{{ category.name }}</span>
+                                    <span class="category-percentage">{{ category.percentage|round|int }}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" data-category="{{ category.name }}" style="width: {{ category.percentage|round|int }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-categories">Noch keine Kategorien gespielt</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% set stat_items = [
+                    ('check-circle', 'Gespielte Quizze', stats.total_quizzes),
+                    ('percentage', 'Durchschnitt richtig', stats.average_score ~ '%'),
+                    ('trophy', 'Beste Kategorie', stats.best_category),
+                    ('mountain', 'Schwierigste Kategorie', stats.hardest_category)
+                ] %}
+                
+                <div class="grid-card statistics">
+                    <h2><i class="fas fa-chart-pie"></i> Statistiken</h2>
+                    <div class="stats-grid">
+                        {% for icon, label, value in stat_items %}
+                        <div class="stat-card">
+                            <i class="fas fa-{{ icon }}"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">{{ label }}</span>
+                                <span class="stat-value">{{ value }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="grid-card recent-results">
                     <div class="card-header">
                         <h2><i class="fas fa-history"></i> Letzte Ergebnisse</h2>
                     </div>
@@ -26,26 +93,19 @@
                         {% set results = get_user_results() %}
                         {% if results %}
                             {% for result in results[:5] %}
-                                <a href="{{ url_for('show_result', result_id=result.id) }}" class="result-item">
-                                    <span class="date">{{ result.date.strftime('%d.%m.%Y') }}</span>
-                                    <span class="result-category">
-                                        {{ result.category|capitalize }}
-                                    </span>
-                                    <span class="result-score">{{ result.score }}/5 Punkte</span>
-                                </a>
+                            <a href="{{ url_for('show_result', result_id=result.id) }}" class="result-item">
+                                <span class="date">{{ result.date.strftime('%d.%m.%Y') }}</span>
+                                <span class="result-category" data-category="{{ result.category|capitalize }}">
+                                    <i class="fas fa-{{ category_icons.get(result.category|capitalize, category_icons.default) }}"></i>
+                                    <span>{{ 'Zufällige Fragen' if result.category == 'zufällige fragen' else result.category|capitalize }}</span>
+                                </span>
+                                <span class="result-score">{{ result.score }}/5 Punkte</span>
+                            </a>
                             {% endfor %}
                         {% else %}
                             <p class="no-results">Noch keine Quizze gespielt</p>
                         {% endif %}
                     </div>
-                </div>
-
-                <div class="grid-card quick-start">
-                    <h2><i class="fas fa-play-circle"></i> Schnellstart</h2>
-                    <p>Bereit für eine neue Herausforderung?</p>
-                    <a href="{{ url_for('categories') }}" class="button start-button">
-                        <i class="fas fa-play"></i> Quiz starten
-                    </a>
                 </div>
             </div>
         </div>
