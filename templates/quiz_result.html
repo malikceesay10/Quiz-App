@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Ergebnis - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+</head>
+<body class="quiz-body">
+    <div class="quiz-container">
+        <div class="result-header">
+            <h1>Quiz Ergebnis</h1>
+            <div class="score">{{ score }}/{{ total }} Punkte</div>
+            <p>{{ (score/total * 100)|round|int }}% richtig beantwortet</p>
+        </div>
+
+        <div class="answers-review">
+            {% for answer in answers %}
+            <div class="answer-review {{ 'correct' if answer.is_correct else 'incorrect' }}">
+                <h3>{{ answer.question }}</h3>
+                <p>Deine Antwort: {{ answer.user_answer }}</p>
+                {% if not answer.is_correct %}
+                    <p>Richtige Antwort: {{ answer.correct_answer }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="button-container">
+            <a href="{{ url_for('index') }}" class="button secondary">Zum Dashboard</a>
+            <a href="{{ url_for('categories') }}" class="button primary">Neues Quiz</a>
+        </div>
+    </div>
+</body>
+</html>
