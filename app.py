@@ -230,6 +230,74 @@ def show_result(result_id):
                          total=len(answers),
                          answers=answers)
 
+@app.route('/all-questions')
+@login_required
+def all_questions_categories():
+    return render_template('categories.html', username=session['username'], mode='all_questions')
+
+@app.route('/all-questions/<category>')
+@login_required
+def show_category_questions(category):
+    questions = Quiz.query.filter_by(category=category).all()
+    return render_template('all_questions.html', 
+                         username=session['username'], 
+                         category=category, 
+                         questions=questions)
+
+@app.route('/question/<int:question_id>')
+@login_required
+def answer_single_question(question_id):
+    question = Quiz.query.get_or_404(question_id)
+    answers = [
+        question.correct_answer,
+        question.wrong_answer1,
+        question.wrong_answer2,
+        question.wrong_answer3
+    ]
+    random.shuffle(answers)
+    
+    return render_template('question.html',
+                         question=question,
+                         answers=answers,
+                         current=1,
+                         total=1,
+                         single_question=True)
+
+@app.route('/question/<int:question_id>/answer', methods=['POST'])
+@login_required
+def submit_single_answer(question_id):
+    question = Quiz.query.get_or_404(question_id)
+    answer = request.form.get('answer')
+    is_correct = answer == question.correct_answer
+    
+    user = get_current_user()
+    
+    result = QuizResult(
+        user_id=user.id,
+        score=1 if is_correct else 0,
+        category=question.category,
+        answers=json.dumps([{
+            'question': question.question,
+            'user_answer': answer,
+            'correct_answer': question.correct_answer,
+            'is_correct': is_correct
+        }])
+    )
+    
+    db.session.add(result)
+    db.session.commit()
+    
+    return render_template('quiz_result.html',
+                         score=1 if is_correct else 0,
+                         total=1,
+                         answers=[{
+                             'question': question.question,
+                             'user_answer': answer,
+                             'correct_answer': question.correct_answer,
+                             'is_correct': is_correct
+                         }],
+                         single_question=True)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

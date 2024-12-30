@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alle Fragen - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all_questions.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        {% include 'sidebar.html' %}
+        
+        <div class="main-content">
+            <div class="questions-container">
+                <div class="header-section">
+                    <a href="{{ url_for('all_questions_categories') }}" class="back-button">
+                        <i class="fas fa-arrow-left"></i> Zurück zur Kategorieauswahl
+                    </a>
+                    <h2>{{ category|capitalize }} Fragen</h2>
+                </div>
+                
+                <div class="questions-list">
+                    {% for question in questions %}
+                    <div class="question-card">
+                        <h3>Frage {{ loop.index }}</h3>
+                        <p>{{ question.question }}</p>
+                        <form action="{{ url_for('answer_single_question', question_id=question.id) }}" method="get">
+                            <button type="submit" class="btn btn-primary">Beantworten</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
