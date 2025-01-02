@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func, desc
+import random, json
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
@@ -47,6 +49,66 @@ class QuizResult(db.Model):
     category = db.Column(db.String(50))
     date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     answers = db.Column(db.Text)
+
+def get_user_stats(user_id):
+    return {
+        'total_quizzes': QuizResult.query.filter_by(user_id=user_id).count(),
+        'average_score': calculate_average_score(user_id),
+        'best_category': get_best_category(user_id),
+        'hardest_category': get_hardest_category(user_id)
+    }
+
+def get_current_user():
+    if 'username' in session:
+        return User.query.filter_by(username=session['username']).first()
+    return None
+
+def get_total_quizzes(user_id):
+    return QuizResult.query.filter_by(user_id=user_id).count()
+
+def calculate_average_score(user_id):
+    results = QuizResult.query.filter_by(user_id=user_id).all()
+    if not results:
+        return 0
+    total_score = sum(result.score for result in results)
+    return round((total_score / (len(results) * 5)) * 100, 1)
+
+def get_best_category(user_id):
+    results = QuizResult.query.filter_by(user_id=user_id)\
+        .with_entities(QuizResult.category, db.func.avg(QuizResult.score).label('avg_score'))\
+        .group_by(QuizResult.category)\
+        .order_by(db.desc('avg_score'))\
+        .first()
+    return results.category.capitalize() if results else "Keine"
+
+def get_hardest_category(user_id):
+    results = QuizResult.query.filter_by(user_id=user_id)\
+        .with_entities(QuizResult.category, db.func.avg(QuizResult.score).label('avg_score'))\
+        .group_by(QuizResult.category)\
+        .having(db.func.count(QuizResult.id) >= 1)\
+        .order_by(db.asc('avg_score'))\
+        .first()
+    return results.category.capitalize() if results else "Keine"
+
+def get_top_categories(user_id):
+    categories = QuizResult.query.filter_by(user_id=user_id)\
+        .with_entities(
+            QuizResult.category,
+            db.func.count(QuizResult.id).label('total_quizzes'),
+            db.func.avg(QuizResult.score).label('avg_score')
+        )\
+        .group_by(QuizResult.category)\
+        .order_by(db.desc('avg_score'))\
+        .limit(3)\
+        .all()
+    
+    return [
+        {
+            'name': cat.category.capitalize(),
+            'percentage': int(round(float(cat.avg_score or 0) / 5 * 100))
+        }
+        for cat in categories
+    ] or [{'name': 'Keine Daten', 'percentage': 0}] * 3
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
