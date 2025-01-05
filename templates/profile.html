@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profil - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        {% include 'sidebar.html' %}
+
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1>Profil</h1>
+                <p class="subtitle">Verwalte deine persönlichen Einstellungen</p>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-section stats-section">
+                    <h2><i class="fas fa-chart-line"></i> Statistiken</h2>
+                    <div class="stats-grid">
+                        {% set stat_items = [
+                            ('check-circle', 'Gespielte Quizze', stats.total_quizzes),
+                            ('percentage', 'Durchschnitt richtig', stats.average_score ~ '%'),
+                            ('trophy', 'Beste Kategorie', stats.best_category),
+                            ('mountain', 'Schwierigste Kategorie', stats.hardest_category)
+                        ] %}
+                        
+                        {% for icon, label, value in stat_items %}
+                        <div class="stat-card">
+                            <i class="fas fa-{{ icon }}"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">{{ label }}</span>
+                                <span class="stat-value">{{ value }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="profile-section user-info">
+                    <h2><i class="fas fa-user"></i> Benutzerdaten</h2>
+                    <form method="POST" class="profile-form">
+                        {% set user_fields = [
+                            ('username', 'Benutzername', user.username),
+                            ('firstname', 'Vorname', user.firstname),
+                            ('lastname', 'Nachname', user.lastname)
+                        ] %}
+                        
+                        {% for field, label, value in user_fields %}
+                        <div class="info-group">
+                            <label>{{ label }}:</label>
+                            <input type="text" name="{{ field }}" value="{{ value }}" required>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="form-actions">
+                            <button type="submit" name="update_profile" class="btn-save">
+                                <i class="fas fa-save"></i> Speichern
+                            </button>
+                            <button type="reset" class="btn-save btn-cancel">
+                                <i class="fas fa-undo"></i> Zurücksetzen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="profile-section password-section">
+                    <h2><i class="fas fa-key"></i> Passwort ändern</h2>
+                    <form method="POST" id="passwordForm">
+                        {% set password_fields = [
+                            ('old_password', 'Aktuelles Passwort'),
+                            ('new_password', 'Neues Passwort'),
+                            ('confirm_password', 'Passwort bestätigen')
+                        ] %}
+                        
+                        {% for field, label in password_fields %}
+                        <div class="info-group">
+                            <label>{{ label }}:</label>
+                            <div class="password-input-group">
+                                <input type="password" name="{{ field }}" required>
+                                <button type="button" class="password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <button type="submit" name="update_password" class="btn-save">
+                            <i class="fas fa-key"></i> Passwort ändern
+                        </button>
+                    </form>
+                </div>
+
+                <div class="profile-section account-delete">
+                    <h2><i class="fas fa-trash"></i> Konto löschen</h2>
+                    <div class="delete-warning">
+                        <i class="fas fa-exclamation-triangle warning-icon"></i>
+                        <div>
+                            <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.
+                            Alle Ihre Daten werden permanent gelöscht.
+                        </div>
+                    </div>
+                    <button type="button" id="deleteAccountBtn" class="btn-save btn-delete">
+                        <i class="fas fa-trash"></i> Konto endgültig löschen
+                    </button>
+                </div>
+                
+                <div id="deleteConfirmModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Konto löschen
+                            </h2>
+                        </div>
+                        <div class="modal-body">
+                            <p>Sie sind dabei, Ihr Konto endgültig zu löschen. Diese Aktion wird:</p>
+                            <ul style="margin: 1rem 0 1.5rem 1.5rem;">
+                                <li>Alle Ihre persönlichen Daten entfernen</li>
+                                <li>Ihre gesamte Quiz-Historie löschen</li>
+                                <li>Alle Freundschaftsverbindungen aufheben</li>
+                            </ul>
+                            <p>Sind Sie sicher, dass Sie fortfahren möchten?</p>
+                            <p>
+                                <i class="fas fa-exclamation-circle"></i>
+                                Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="cancel-btn" onclick="closeDeleteModal()">
+                                <i class="fas fa-times"></i> Abbrechen
+                            </button>
+                            <form method="POST" action="{{ url_for('delete_account') }}" style="margin: 0;">
+                                <button type="submit" class="confirm-delete-btn">
+                                    <i class="fas fa-trash"></i> Endgültig löschen
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const icon = this.querySelector('i');
+                const isPassword = input.type === 'password';
+                
+                input.type = isPassword ? 'text' : 'password';
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        });
+
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        document.getElementById('deleteAccountBtn').onclick = () => {
+            deleteModal.style.display = 'flex';
+            document.body.classList.add('modal-open');
+        };
+
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    </script>
+</body>
+</html>
