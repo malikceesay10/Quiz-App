@@ -360,6 +360,105 @@ def submit_single_answer(question_id):
                          }],
                          single_question=True)
 
+@app.route('/friends', methods=['GET', 'POST'])
+@login_required
+def friends():
+    user = get_current_user()
+    
+    if request.method == 'POST':
+        friend_username = request.form.get('friend_username')
+        friend = User.query.filter_by(username=friend_username).first()
+        
+        if friend and friend.id != user.id:
+            existing_friendship = Friendship.query.filter(
+                ((Friendship.user_id == user.id) & (Friendship.friend_id == friend.id)) |
+                ((Friendship.user_id == friend.id) & (Friendship.friend_id == user.id))
+            ).first()
+            
+            if not existing_friendship:
+                friendship = Friendship(user_id=user.id, friend_id=friend.id)
+                db.session.add(friendship)
+                db.session.commit()
+                return redirect(url_for('friends'))
+    
+    friends_list = User.query.join(Friendship, 
+        ((User.id == Friendship.friend_id) & (Friendship.user_id == user.id)) |
+        ((User.id == Friendship.user_id) & (Friendship.friend_id == user.id))
+    ).all()
+    
+    return render_template('friends.html', friends=friends_list, username=session['username'])
+
+@app.route('/remove_friend', methods=['POST'])
+@login_required
+def remove_friend():
+    user = get_current_user()
+    friend_username = request.form.get('friend_username')
+    friend = User.query.filter_by(username=friend_username).first()
+    
+    if friend and friend.id != user.id:
+        friendship = Friendship.query.filter(
+            ((Friendship.user_id == user.id) & (Friendship.friend_id == friend.id)) |
+            ((Friendship.user_id == friend.id) & (Friendship.friend_id == user.id))
+        ).first()
+        
+        if friendship:
+            db.session.delete(friendship)
+            db.session.commit()
+    
+    return redirect(url_for('friends'))
+
+@app.route('/api/search_user/<username>')
+@login_required
+def search_user(username):
+    user = User.query.filter_by(username=username).first()
+    current_user = get_current_user()
+    
+    if user and user != current_user:
+        friendship = Friendship.query.filter(
+            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == user.id)) |
+            ((Friendship.user_id == user.id) & (Friendship.friend_id == current_user.id))
+        ).first()
+        
+        if not friendship:
+            return jsonify({
+                'found': True,
+                'username': user.username
+            })
+    
+    return jsonify({'found': False})
+
+@app.route('/api/user_profile/<username>')
+@login_required
+def get_user_profile(username):
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    user_stats = get_user_stats(user.id)
+    
+    return jsonify({
+        'username': user.username,
+        'firstname': user.firstname,
+        'lastname': user.lastname,
+        'stats': {
+            'total_quizzes': user_stats['total_quizzes'],
+            'average_score': user_stats['average_score'],
+            'best_category': user_stats['best_category']
+        }
+    })
+
+@app.context_processor
+def utility_processor():
+    def get_user_results():
+        if 'username' in session:
+            user = User.query.filter_by(username=session['username']).first()
+            if user:
+                all_results = QuizResult.query.filter_by(user_id=user.id).order_by(QuizResult.date.desc()).all()
+                return [result for result in all_results if len(json.loads(result.answers)) == 5]
+        return []
+    return dict(get_user_results=get_user_results)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Freunde - Quiz App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        {% include 'sidebar.html' %}
+
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1>Freunde</h1>
+                <p class="subtitle">Verbinde dich mit anderen Quizspielern</p>
+            </div>
+            
+            <div class="friends-header">
+                <h1>Meine Freunde</h1>
+                <button id="toggleSearch" class="btn btn-blue toggle-search-btn">
+                    <i class="fas fa-user-plus"></i> Freund suchen
+                </button>
+            </div>
+
+            <div id="searchSection" class="add-friend-section" style="display: none;">
+                <div class="search-container">
+                    <input type="text" id="friendSearch" placeholder="Benutzername eingeben">
+                    <button type="button" class="btn btn-blue search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i> Suchen
+                    </button>
+                </div>
+                <div id="searchResults" class="search-results" style="display: none;"></div>
+                <form method="POST" id="addFriendForm" style="display: none;">
+                    <input type="hidden" name="friend_username" id="selectedUsername">
+                </form>
+            </div>
+
+            <div class="friends-content">
+                {% if friends %}
+                    <div class="friends-list">
+                        {% for friend in friends %}
+                            <div class="card hover-transform friend-card" onclick="showFriendProfile(this, '{{ friend.username }}')">
+                                <i class="fas fa-user friend-icon"></i>
+                                <span class="friend-name">{{ friend.username }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="no-friends">Noch keine Freunde hinzugefügt</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="friendProfileModal" class="friend-profile-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> <span id="profileUsername"></span></h2>
+                <button class="close-modal" onclick="closeFriendProfile()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="profile-info">
+                    {% set info_fields = [('Vorname', 'profileFirstname'), ('Nachname', 'profileLastname')] %}
+                    {% for label, id in info_fields %}
+                        <div class="info-group">
+                            <label>{{ label }}:</label>
+                            <span id="{{ id }}"></span>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="profile-section stats-section">
+                    <div class="stats-grid">
+                        {% set stats = [
+                            ('check-circle', 'Gespielte Quizze', 'totalQuizzes', '0'),
+                            ('percentage', 'Durchschnitt', 'averageScore', '0%'),
+                            ('trophy', 'Beste Kategorie', 'bestCategory', '-')
+                        ] %}
+                        
+                        {% for icon, label, id, default in stats %}
+                            <div class="stat-card">
+                                <i class="fas fa-{{ icon }}"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">{{ label }}</span>
+                                    <span class="stat-value" id="{{ id }}">{{ default }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-blue remove-friend-btn" onclick="removeFriend()">
+                    <i class="fas fa-user-minus"></i> Freund entfernen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function initFriendSearch() {
+            const searchBtn = document.getElementById('searchBtn');
+            const toggleSearch = document.getElementById('toggleSearch');
+            const searchSection = document.getElementById('searchSection');
+
+            toggleSearch.addEventListener('click', () => {
+                const isHidden = searchSection.style.display === 'none';
+                searchSection.style.display = isHidden ? 'block' : 'none';
+                toggleSearch.innerHTML = isHidden ? 
+                    '<i class="fas fa-times"></i> Abbrechen' : 
+                    '<i class="fas fa-user-plus"></i> Freund suchen';
+            });
+
+            searchBtn.addEventListener('click', async () => {
+                const username = document.getElementById('friendSearch').value;
+                const searchResults = document.getElementById('searchResults');
+                
+                try {
+                    const response = await fetch(/api/search_user/${username});
+                    const data = await response.json();
+                    
+                    searchResults.innerHTML = data.found ? 
+                        `<div class="search-result-item">
+                            <div class="user-info">
+                                <i class="fas fa-user"></i>
+                                <span>${data.username}</span>
+                            </div>
+                            <button type="button" class="add-friend-btn" onclick="addFriend('${data.username}')">
+                                <i class="fas fa-user-plus"></i> Hinzufügen
+                            </button>
+                        </div>` : 
+                        `<div class="search-result-item">
+                            <p class="no-results">Kein Benutzer gefunden</p>
+                        </div>`;
+                    
+                    searchResults.style.display = 'block';
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        async function showFriendProfile(card, username) {
+            try {
+                const response = await fetch(/api/user_profile/${username});
+                const data = await response.json();
+                
+                ['Username', 'Firstname', 'Lastname'].forEach(field => {
+                    document.getElementById(profile${field}).textContent = data[field.toLowerCase()];
+                });
+                
+                document.getElementById('totalQuizzes').textContent = data.stats.total_quizzes;
+                document.getElementById('averageScore').textContent = data.stats.average_score + '%';
+                document.getElementById('bestCategory').textContent = data.stats.best_category;
+                
+                document.getElementById('friendProfileModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function addFriend(username) {
+            document.getElementById('selectedUsername').value = username;
+            document.getElementById('addFriendForm').submit();
+        }
+
+        function closeFriendProfile() {
+            document.getElementById('friendProfileModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        function removeFriend() {
+            const username = document.getElementById('profileUsername').textContent;
+            const form = document.getElementById('addFriendForm');
+            form.action = "{{ url_for('remove_friend') }}";
+            document.getElementById('selectedUsername').value = username;
+            form.submit();
+        }
+
+        initFriendSearch();
+        window.onclick = e => {
+            if (e.target === document.getElementById('friendProfileModal')) {
+                closeFriendProfile();
+            }
+        };
+    </script>
+</body>
+</html>
+
