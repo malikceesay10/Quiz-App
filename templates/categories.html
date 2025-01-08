@@ -20,44 +20,59 @@
 
             <div class="categories-grid">
                 {% set categories = {
-                    'zufällige fragen': {
+                    'Zufällige fragen': {
                         'icon': 'random',
                         'description': 'Gemischte Fragen aus allen Kategorien'
                     },
-                    'geschichte': {
-                        'icon': 'monument',
-                        'description': 'Teste dein historisches Wissen'
+                    'python': {
+                        'icon': 'code',
+                        'description': 'Grundlegende Python-Programmierung'
                     },
-                    'wissenschaft': {
-                        'icon': 'flask',
-                        'description': 'Naturwissenschaftliche Fragen'
+                    'full-stack': {
+                        'icon': 'layer-group',
+                        'description': 'Einführung in Full-Stack Entwicklung'
                     },
-                    'geographie': {
-                        'icon': 'globe-americas',
-                        'description': 'Länder, Städte und mehr'
+                    'github': {
+                        'icon': 'code-branch',
+                        'description': 'Versionskontrolle mit Git und GitHub'
                     },
-                    'sport': {
-                        'icon': 'football-ball',
-                        'description': 'Alles rund um Sport'
+                    'flask': {
+                        'icon': 'server',
+                        'description': 'Web-Entwicklung mit Flask'
                     },
-                    'musik': {
-                        'icon': 'music',
-                        'description': 'Von Klassik bis Pop'
+                    'designentscheidungen': {
+                        'icon': 'sitemap',
+                        'description': 'Dokumentation von Designentscheidungen'
                     },
-                    'film': {
-                        'icon': 'film',
-                        'description': 'Filme, Serien und Stars'
+                    'frontend': {
+                        'icon': 'desktop',
+                        'description': 'HTML, CSS und Frontend-Basics'
+                    },
+                    'benutzeroberflächen': {
+                        'icon': 'window-maximize',
+                        'description': 'UI-Entwicklung mit WTForms und Bootstrap'
                     }
                 } %}
 
                 {% for category, data in categories.items() %}
-                    {% if category != 'zufällige fragen' or mode != 'all_questions' %}
-                        {% set target_url = url_for('show_category_questions', category=category) if mode == 'all_questions' else url_for('start_quiz', category=category) %}
+                    {% if mode == 'all_questions' %}
+                        {% if category != 'Zufällige fragen' %}
+                            {% set target_url = url_for('show_category_questions', category=category) %}
+                            <a href="{{ target_url }}" class="category-card">
+                                <div class="category-icon">
+                                    <i class="fas fa-{{ data.icon }}"></i>
+                                </div>
+                                <h2>{{ category|title }}</h2>
+                                <p>{{ data.description }}</p>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        {% set target_url = url_for('start_quiz', category=category) %}
                         <a href="{{ target_url }}" class="category-card">
                             <div class="category-icon">
                                 <i class="fas fa-{{ data.icon }}"></i>
                             </div>
-                            <h2>{{ category|capitalize }}</h2>
+                            <h2>{{ category|title }}</h2>
                             <p>{{ data.description }}</p>
                         </a>
                     {% endif %}

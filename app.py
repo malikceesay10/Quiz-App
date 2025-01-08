@@ -11,7 +11,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
 app.permanent_session_lifetime = timedelta(days=7)
 db = SQLAlchemy(app)
 
-
 def login_required(f):
     def wrapper(*args, **kwargs):
         if 'username' not in session:
@@ -49,6 +48,12 @@ class QuizResult(db.Model):
     category = db.Column(db.String(50))
     date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     answers = db.Column(db.Text)
+
+class Friendship(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
 def get_user_stats(user_id):
     return {
@@ -169,6 +174,56 @@ def index():
                             stats=get_user_stats(user.id),
                             top_categories=get_top_categories(user.id))
     return render_template('index.html')
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    user = get_current_user()
+    if request.method == 'POST':
+        if 'update_profile' in request.form:
+            new_username = request.form.get('username')
+            if new_username != user.username and User.query.filter_by(username=new_username).first():
+                flash('Benutzername bereits vergeben')
+                return redirect(url_for('profile'))
+            
+            user.username = new_username
+            user.firstname = request.form.get('firstname')
+            user.lastname = request.form.get('lastname')
+            session['username'] = new_username
+            db.session.commit()
+            flash('Profil erfolgreich aktualisiert')
+        elif 'update_password' in request.form:
+            if not user.check_password(request.form.get('old_password')):
+                flash('Aktuelles Passwort ist falsch')
+                return redirect(url_for('profile'))
+            
+            if request.form.get('new_password') != request.form.get('confirm_password'):
+                flash('Neue Passwörter stimmen nicht überein')
+                return redirect(url_for('profile'))
+
+            user.set_password(request.form.get('new_password'))
+            db.session.commit()
+            session.clear()
+            flash('Passwort erfolgreich geändert. Bitte erneut einloggen.')
+            return redirect(url_for('login'))
+
+    return render_template('profile.html', user=user, stats=get_user_stats(user.id), username=user.username)
+
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = get_current_user()
+    if user:
+        Friendship.query.filter(
+            (Friendship.user_id == user.id) | (Friendship.friend_id == user.id)
+        ).delete()
+        
+        db.session.delete(user)
+        db.session.commit()
+        session.clear()
+        flash('Ihr Konto wurde erfolgreich gelöscht.')
+        
+    return redirect(url_for('login'))
 
 @app.route('/categories')
 @login_required
@@ -434,7 +489,7 @@ def get_user_profile(username):
     
     if not user:
         return jsonify({'error': 'User not found'}), 404
-
+  
     user_stats = get_user_stats(user.id)
     
     return jsonify({

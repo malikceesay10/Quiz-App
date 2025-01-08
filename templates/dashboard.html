@@ -19,7 +19,7 @@
             </div>
 
             <div class="dashboard-grid">
-
+                <!-- Schnellstart Widget -->
                 <div class="grid-card quick-start">
                     <h2><i class="fas fa-play-circle"></i> Schnellstart</h2>
                     <p>Bereit für eine neue Herausforderung?</p>
@@ -34,26 +34,27 @@
                     <div class="category-progress-list">
                         {% if top_categories %}
                             {% set category_icons = {
-                                'Geschichte': 'monument',
-                                'Wissenschaft': 'flask',
-                                'Geographie': 'globe-americas',
-                                'Sport': 'football-ball',
-                                'Musik': 'music',
-                                'Film': 'film',
-                                'default': 'random'
+                                'python': 'code',
+                                'full-stack': 'layer-group',
+                                'github': 'code-branch',
+                                'flask': 'server',
+                                'designentscheidungen': 'sitemap',
+                                'frontend': 'desktop',
+                                'benutzeroberflächen': 'window-maximize',
+                                'Zufällige fragen': 'random'
                             } %}
                             
                             {% for category in top_categories %}
                             <div class="category-progress">
                                 <div class="category-info">
-                                    <div class="category-icon" data-category="{{ category.name }}">
-                                        <i class="fas fa-{{ category_icons.get(category.name, category_icons.default) }}"></i>
+                                    <div class="category-icon" data-category="{{ category.name|capitalize }}">
+                                        <i class="fas fa-{{ category_icons.get(category.name|lower, 'question') }}"></i>
                                     </div>
-                                    <span class="category-name">{{ category.name }}</span>
+                                    <span class="category-name">{{ category.name|capitalize }}</span>
                                     <span class="category-percentage">{{ category.percentage|round|int }}%</span>
                                 </div>
                                 <div class="progress-bar">
-                                    <div class="progress" data-category="{{ category.name }}" style="width: {{ category.percentage|round|int }}%"></div>
+                                    <div class="progress" data-category="{{ category.name|capitalize }}" style="width: {{ category.percentage|round|int }}%"></div>
                                 </div>
                             </div>
                             {% endfor %}
@@ -96,8 +97,8 @@
                             <a href="{{ url_for('show_result', result_id=result.id) }}" class="result-item">
                                 <span class="date">{{ result.date.strftime('%d.%m.%Y') }}</span>
                                 <span class="result-category" data-category="{{ result.category|capitalize }}">
-                                    <i class="fas fa-{{ category_icons.get(result.category|capitalize, category_icons.default) }}"></i>
-                                    <span>{{ 'Zufällige Fragen' if result.category == 'zufällige fragen' else result.category|capitalize }}</span>
+                                    <i class="fas fa-{{ category_icons.get(result.category|lower, 'question') }}"></i>
+                                    <span>{{ result.category|capitalize }}</span>
                                 </span>
                                 <span class="result-score">{{ result.score }}/5 Punkte</span>
                             </a>

@@ -123,7 +123,7 @@
                 const searchResults = document.getElementById('searchResults');
                 
                 try {
-                    const response = await fetch(/api/search_user/${username});
+                    const response = await fetch(`/api/search_user/${username}`);
                     const data = await response.json();
                     
                     searchResults.innerHTML = data.found ? 
@@ -149,11 +149,11 @@
 
         async function showFriendProfile(card, username) {
             try {
-                const response = await fetch(/api/user_profile/${username});
+                const response = await fetch(`/api/user_profile/${username}`);
                 const data = await response.json();
                 
                 ['Username', 'Firstname', 'Lastname'].forEach(field => {
-                    document.getElementById(profile${field}).textContent = data[field.toLowerCase()];
+                    document.getElementById(`profile${field}`).textContent = data[field.toLowerCase()];
                 });
                 
                 document.getElementById('totalQuizzes').textContent = data.stats.total_quizzes;
@@ -194,4 +194,3 @@
     </script>
 </body>
 </html>
-
