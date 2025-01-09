@@ -56,6 +56,13 @@ class Friendship(db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
 def get_user_stats(user_id):
+    if user_id is None:
+        return {
+            'total_quizzes': 0,
+            'average_score': 0,
+            'best_category': "Keine",
+            'hardest_category': "Keine"
+        }
     return {
         'total_quizzes': QuizResult.query.filter_by(user_id=user_id).count(),
         'average_score': calculate_average_score(user_id),
@@ -169,6 +176,9 @@ def logout():
 def index():
     if 'username' in session:
         user = get_current_user()
+        if user is None:
+            session.clear()
+            return redirect(url_for('login'))
         return render_template('dashboard.html',
                             username=session['username'],
                             stats=get_user_stats(user.id),
@@ -179,6 +189,9 @@ def index():
 @login_required
 def profile():
     user = get_current_user()
+    if user is None:
+        session.clear()
+        return redirect(url_for('login'))
     if request.method == 'POST':
         if 'update_profile' in request.form:
             new_username = request.form.get('username')
@@ -508,9 +521,10 @@ def utility_processor():
     def get_user_results():
         if 'username' in session:
             user = User.query.filter_by(username=session['username']).first()
-            if user:
-                all_results = QuizResult.query.filter_by(user_id=user.id).order_by(QuizResult.date.desc()).all()
-                return [result for result in all_results if len(json.loads(result.answers)) == 5]
+            if user is None:
+                return []
+            all_results = QuizResult.query.filter_by(user_id=user.id).order_by(QuizResult.date.desc()).all()
+            return [result for result in all_results if len(json.loads(result.answers)) == 5]
         return []
     return dict(get_user_results=get_user_results)
 

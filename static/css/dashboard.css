@@ -64,9 +64,33 @@
 [data-category="Benutzeroberflächen"] i { color: #689f38; }
 [data-category="Zufällige Fragen"] i { color: #7952b3; }
 
+.category-icon[data-category="Python"] i,
+.result-category[data-category="Python"] i { color: #1976d2; }
+
+.category-icon[data-category="Full-Stack"] i,
+.result-category[data-category="Full-Stack"] i { color: #388e3c; }
+
+.category-icon[data-category="Github"] i,
+.result-category[data-category="Github"] i { color: #f57c00; }
+
+.category-icon[data-category="Flask"] i,
+.result-category[data-category="Flask"] i { color: #c2185b; }
+
+.category-icon[data-category="Designentscheidungen"] i,
+.result-category[data-category="Designentscheidungen"] i { color: #5e35b1; }
+
+.category-icon[data-category="Frontend"] i,
+.result-category[data-category="Frontend"] i { color: #0288d1; }
+
+.category-icon[data-category="Benutzeroberflächen"] i,
+.result-category[data-category="Benutzeroberflächen"] i { color: #689f38; }
+
+.category-icon[data-category="Zufällige Fragen"] i,
+.result-category[data-category="Zufällige Fragen"] i { color: #7952b3; }
+
 .progress[data-category="Python"] { background-color: #1976d2; }
 .progress[data-category="Full-Stack"] { background-color: #388e3c; }
-.progress[data-category="GitHub"] { background-color: #f57c00; }
+.progress[data-category="Github"] { background-color: #f57c00; }
 .progress[data-category="Flask"] { background-color: #c2185b; }
 .progress[data-category="Designentscheidungen"] { background-color: #5e35b1; }
 .progress[data-category="Frontend"] { background-color: #0288d1; }

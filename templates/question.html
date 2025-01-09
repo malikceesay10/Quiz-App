@@ -11,7 +11,7 @@
         <div class="quiz-top">
             <div class="quiz-header">
                 <div class="question-counter">Frage {{ current }} von {{ total }}</div>
-                <div class="timer" id="timer">10</div>
+                <div class="timer" id="timer">15</div>
             </div>
             <div class="question-text">
                 <h2>{{ question.question }}</h2>
@@ -46,7 +46,7 @@
         const form = document.getElementById('quiz-form');
         const nextBtn = document.getElementById('next-btn');
         const radioInputs = document.querySelectorAll('input[type="radio"]');
-        let timeLeft = 10;
+        let timeLeft = 15;
 
         setInterval(() => {
             if (timeLeft > 0) {
