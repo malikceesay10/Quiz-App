@@ -51,13 +51,13 @@
     overflow: hidden;
 }
 
-.category-card[href*="zufällige"] { background: linear-gradient(135deg, #fff, #f0f2f5); }
-.category-card[href*="geschichte"] { background: linear-gradient(135deg, #fff, #ffebee); }
-.category-card[href*="wissenschaft"] { background: linear-gradient(135deg, #fff, #e3f2fd); }
-.category-card[href*="geographie"] { background: linear-gradient(135deg, #fff, #e8f5e9); }
-.category-card[href*="sport"] { background: linear-gradient(135deg, #fff, #fff3e0); }
-.category-card[href*="musik"] { background: linear-gradient(135deg, #fff, #f3e5f5); }
-.category-card[href*="film"] { background: linear-gradient(135deg, #fff, #fce4ec); }
+.category-card[href*="python"] { background: linear-gradient(135deg, #fff, #e3f2fd); }
+.category-card[href*="full-stack"] { background: linear-gradient(135deg, #fff, #e8f5e9); }
+.category-card[href*="github"] { background: linear-gradient(135deg, #fff, #fff3e0); }
+.category-card[href*="flask"] { background: linear-gradient(135deg, #fff, #fce4ec); }
+.category-card[href*="designentscheidungen"] { background: linear-gradient(135deg, #fff, #ede7f6); }
+.category-card[href*="frontend"] { background: linear-gradient(135deg, #fff, #e1f5fe); }
+.category-card[href*="benutzeroberflächen"] { background: linear-gradient(135deg, #fff, #f1f8e9); }
 
 .category-icon {
     width: 50px;
@@ -74,13 +74,13 @@
     font-size: 1.5rem;
 }
 
-.category-card[href*="zufällige"] .category-icon i { color: #7952b3; }
-.category-card[href*="geschichte"] .category-icon i { color: #d32f2f; }
-.category-card[href*="wissenschaft"] .category-icon i { color: #1976d2; }
-.category-card[href*="geographie"] .category-icon i { color: #388e3c; }
-.category-card[href*="sport"] .category-icon i { color: #f57c00; }
-.category-card[href*="musik"] .category-icon i { color: #8e24aa; }
-.category-card[href*="film"] .category-icon i { color: #c2185b; }
+.category-card[href*="python"] .category-icon i { color: #1976d2; }
+.category-card[href*="full-stack"] .category-icon i { color: #388e3c; }
+.category-card[href*="github"] .category-icon i { color: #f57c00; }
+.category-card[href*="flask"] .category-icon i { color: #c2185b; }
+.category-card[href*="designentscheidungen"] .category-icon i { color: #5e35b1; }
+.category-card[href*="frontend"] .category-icon i { color: #0288d1; }
+.category-card[href*="benutzeroberflächen"] .category-icon i { color: #689f38; }
 
 .category-card h2 {
     color: #333;

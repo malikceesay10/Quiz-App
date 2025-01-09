@@ -4,7 +4,6 @@
 .dashboard-body {
     background-color: #f0f2f5;
     margin: 0;
-    padding: 0;
     min-height: 100vh;
 }
 
@@ -41,34 +40,43 @@
     margin-top: 0.5rem;
 }
 
-.category-icon[data-category="Geschichte"] i,
-.result-category[data-category="Geschichte"] i { color: #d32f2f; }
-.category-icon[data-category="Wissenschaft"] i,
-.result-category[data-category="Wissenschaft"] i { color: #1976d2; }
-.category-icon[data-category="Geographie"] i,
-.result-category[data-category="Geographie"] i { color: #388e3c; }
-.category-icon[data-category="Sport"] i,
-.result-category[data-category="Sport"] i { color: #f57c00; }
-.category-icon[data-category="Musik"] i,
-.result-category[data-category="Musik"] i { color: #8e24aa; }
-.category-icon[data-category="Film"] i,
-.result-category[data-category="Film"] i { color: #c2185b; }
-.category-icon[data-category="Zufällige"] i,
-.result-category[data-category="Zufällige"] i { color: #7952b3; }
+.category-icon {
+    width: 40px;
+    height: 40px;
+    background: #f0f4f8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
 
-.progress[data-category="Geschichte"] { background: #d32f2f; }
-.progress[data-category="Wissenschaft"] { background: #1976d2; }
-.progress[data-category="Geographie"] { background: #388e3c; }
-.progress[data-category="Sport"] { background: #f57c00; }
-.progress[data-category="Musik"] { background: #8e24aa; }
-.progress[data-category="Film"] { background: #c2185b; }
-.progress[data-category="Zufällige"] { background: #7952b3; }
+.category-icon i {
+    font-size: 1.2rem;
+}
+
+[data-category="Python"] i { color: #1976d2; }
+[data-category="Full-Stack"] i { color: #388e3c; }
+[data-category="GitHub"] i { color: #f57c00; }
+[data-category="Flask"] i { color: #c2185b; }
+[data-category="Designentscheidungen"] i { color: #5e35b1; }
+[data-category="Frontend"] i { color: #0288d1; }
+[data-category="Benutzeroberflächen"] i { color: #689f38; }
+[data-category="Zufällige Fragen"] i { color: #7952b3; }
+
+.progress[data-category="Python"] { background-color: #1976d2; }
+.progress[data-category="Full-Stack"] { background-color: #388e3c; }
+.progress[data-category="GitHub"] { background-color: #f57c00; }
+.progress[data-category="Flask"] { background-color: #c2185b; }
+.progress[data-category="Designentscheidungen"] { background-color: #5e35b1; }
+.progress[data-category="Frontend"] { background-color: #0288d1; }
+.progress[data-category="Benutzeroberflächen"] { background-color: #689f38; }
+.progress[data-category="Zufällige Fragen"] { background-color: #7952b3; }
 
 .quick-start {
     text-align: center;
     padding: 2rem;
     background: white;
-    color: #333;
 }
 
 .quick-start h2 {
