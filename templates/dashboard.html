@@ -18,8 +18,7 @@
                 <p class="subtitle">Willkommen zurück! Hier findest du eine Übersicht deiner Quiz-Aktivitäten.</p>
             </div>
 
-            <div class="dashboard-grid">
-                <!-- Schnellstart Widget -->
+            <div class="dashboard-grid">              
                 <div class="grid-card quick-start">
                     <h2><i class="fas fa-play-circle"></i> Schnellstart</h2>
                     <p>Bereit für eine neue Herausforderung?</p>
@@ -54,7 +53,7 @@
                                     <span class="category-percentage">{{ category.percentage|round|int }}%</span>
                                 </div>
                                 <div class="progress-bar">
-                                    <div class="progress" data-category="{{ category.name|capitalize }}" style="width: {{ category.percentage|round|int }}%"></div>
+                                    <div class="progress" data-category="{{ category.name|capitalize }}" style="--progress-width: {{ category.percentage|round|int }}%"></div>
                                 </div>
                             </div>
                             {% endfor %}

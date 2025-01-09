@@ -73,6 +73,10 @@
 .progress[data-category="Benutzeroberflächen"] { background-color: #689f38; }
 .progress[data-category="Zufällige Fragen"] { background-color: #7952b3; }
 
+.progress {
+    width: var(--progress-width);
+}
+
 .quick-start {
     text-align: center;
     padding: 2rem;
