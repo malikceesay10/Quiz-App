@@ -80,16 +80,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', e => {
-                card.style.opacity = '0.7';
-                document.querySelectorAll('.category-card').forEach(c => {
-                    c.style.pointerEvents = 'none';
-                });
-            });
-        });
-    </script>
 </body>
 </html>

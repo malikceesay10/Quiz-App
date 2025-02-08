@@ -20,10 +20,6 @@
             <div class="nav-icon"><i class="fas fa-list"></i></div>
             <span>Alle Fragen</span>
         </a>
-        <a href="{{ url_for('friends') }}" class="nav-item {{ 'active' if request.endpoint == 'friends' }}">
-            <div class="nav-icon"><i class="fas fa-users"></i></div>
-            <span>Freunde</span>
-        </a>
         <a href="{{ url_for('profile') }}" class="nav-item {{ 'active' if request.endpoint == 'profile' }}">
             <div class="nav-icon"><i class="fas fa-user"></i></div>
             <span>Profil</span>

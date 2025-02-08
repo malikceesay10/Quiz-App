@@ -49,25 +49,39 @@ class QuizResult(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     answers = db.Column(db.Text)
 
-class Friendship(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    date_added = db.Column(db.DateTime, default=datetime.utcnow)
-
 def get_user_stats(user_id):
+    default_stats = {
+        'total_quizzes': 0,
+        'average_score': 0,
+        'best_category': "Keine",
+        'hardest_category': "Keine"
+    }
+    
     if user_id is None:
-        return {
-            'total_quizzes': 0,
-            'average_score': 0,
-            'best_category': "Keine",
-            'hardest_category': "Keine"
-        }
+        return default_stats
+    
+    results = QuizResult.query.filter_by(user_id=user_id)
+    total_quizzes = results.count()
+    
+    if not total_quizzes:
+        return default_stats
+
+    category_stats = results.with_entities(
+        QuizResult.category,
+        db.func.avg(QuizResult.score).label('avg_score')
+    ).group_by(QuizResult.category).all()
+    
+    if category_stats:
+        best_category = max(category_stats, key=lambda x: x.avg_score)
+        hardest_category = min(category_stats, key=lambda x: x.avg_score)
+    else:
+        best_category = hardest_category = (None, 0)
+
     return {
-        'total_quizzes': QuizResult.query.filter_by(user_id=user_id).count(),
-        'average_score': calculate_average_score(user_id),
-        'best_category': get_best_category(user_id),
-        'hardest_category': get_hardest_category(user_id)
+        'total_quizzes': total_quizzes,
+        'average_score': round((sum(result.score for result in results) / (total_quizzes * 5)) * 100, 1),
+        'best_category': best_category.category.capitalize() if best_category.category else "Keine",
+        'hardest_category': hardest_category.category.capitalize() if hardest_category.category else "Keine"
     }
 
 def get_current_user():
@@ -75,52 +89,25 @@ def get_current_user():
         return User.query.filter_by(username=session['username']).first()
     return None
 
-def get_total_quizzes(user_id):
-    return QuizResult.query.filter_by(user_id=user_id).count()
-
-def calculate_average_score(user_id):
-    results = QuizResult.query.filter_by(user_id=user_id).all()
-    if not results:
-        return 0
-    total_score = sum(result.score for result in results)
-    return round((total_score / (len(results) * 5)) * 100, 1)
-
-def get_best_category(user_id):
-    results = QuizResult.query.filter_by(user_id=user_id)\
-        .with_entities(QuizResult.category, db.func.avg(QuizResult.score).label('avg_score'))\
-        .group_by(QuizResult.category)\
-        .order_by(db.desc('avg_score'))\
-        .first()
-    return results.category.capitalize() if results else "Keine"
-
-def get_hardest_category(user_id):
-    results = QuizResult.query.filter_by(user_id=user_id)\
-        .with_entities(QuizResult.category, db.func.avg(QuizResult.score).label('avg_score'))\
-        .group_by(QuizResult.category)\
-        .having(db.func.count(QuizResult.id) >= 1)\
-        .order_by(db.asc('avg_score'))\
-        .first()
-    return results.category.capitalize() if results else "Keine"
-
 def get_top_categories(user_id):
-    categories = QuizResult.query.filter_by(user_id=user_id)\
-        .with_entities(
-            QuizResult.category,
-            db.func.count(QuizResult.id).label('total_quizzes'),
-            db.func.avg(QuizResult.score).label('avg_score')
-        )\
-        .group_by(QuizResult.category)\
-        .order_by(db.desc('avg_score'))\
-        .limit(3)\
-        .all()
+    categories = (QuizResult.query
+                 .filter_by(user_id=user_id)
+                 .with_entities(
+                     QuizResult.category,
+                     (db.func.avg(QuizResult.score) * 20).label('percentage')
+                 )
+                 .group_by(QuizResult.category)
+                 .order_by(db.desc('percentage'))
+                 .limit(3)
+                 .all())
     
-    return [
-        {
-            'name': cat.category.capitalize(),
-            'percentage': int(round(float(cat.avg_score or 0) / 5 * 100))
-        }
-        for cat in categories
-    ] or [{'name': 'Keine Daten', 'percentage': 0}] * 3
+    if not categories:
+        return [{'name': 'Keine Daten', 'percentage': 0}] * 3
+    
+    return [{
+        'name': cat.category.capitalize(),
+        'percentage': int(cat.percentage or 0)
+    } for cat in categories]
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -227,10 +214,6 @@ def profile():
 def delete_account():
     user = get_current_user()
     if user:
-        Friendship.query.filter(
-            (Friendship.user_id == user.id) | (Friendship.friend_id == user.id)
-        ).delete()
-        
         db.session.delete(user)
         db.session.commit()
         session.clear()
@@ -400,18 +383,18 @@ def submit_single_answer(question_id):
     answer = request.form.get('answer')
     is_correct = answer == question.correct_answer
     
-    user = get_current_user()
+    answer_data = {
+        'question': question.question,
+        'user_answer': answer,
+        'correct_answer': question.correct_answer,
+        'is_correct': is_correct
+    }
     
     result = QuizResult(
-        user_id=user.id,
+        user_id=get_current_user().id,
         score=1 if is_correct else 0,
         category=question.category,
-        answers=json.dumps([{
-            'question': question.question,
-            'user_answer': answer,
-            'correct_answer': question.correct_answer,
-            'is_correct': is_correct
-        }])
+        answers=json.dumps([answer_data])
     )
     
     db.session.add(result)
@@ -420,101 +403,8 @@ def submit_single_answer(question_id):
     return render_template('quiz_result.html',
                          score=1 if is_correct else 0,
                          total=1,
-                         answers=[{
-                             'question': question.question,
-                             'user_answer': answer,
-                             'correct_answer': question.correct_answer,
-                             'is_correct': is_correct
-                         }],
+                         answers=[answer_data],
                          single_question=True)
-
-@app.route('/friends', methods=['GET', 'POST'])
-@login_required
-def friends():
-    user = get_current_user()
-    
-    if request.method == 'POST':
-        friend_username = request.form.get('friend_username')
-        friend = User.query.filter_by(username=friend_username).first()
-        
-        if friend and friend.id != user.id:
-            existing_friendship = Friendship.query.filter(
-                ((Friendship.user_id == user.id) & (Friendship.friend_id == friend.id)) |
-                ((Friendship.user_id == friend.id) & (Friendship.friend_id == user.id))
-            ).first()
-            
-            if not existing_friendship:
-                friendship = Friendship(user_id=user.id, friend_id=friend.id)
-                db.session.add(friendship)
-                db.session.commit()
-                return redirect(url_for('friends'))
-    
-    friends_list = User.query.join(Friendship, 
-        ((User.id == Friendship.friend_id) & (Friendship.user_id == user.id)) |
-        ((User.id == Friendship.user_id) & (Friendship.friend_id == user.id))
-    ).all()
-    
-    return render_template('friends.html', friends=friends_list, username=session['username'])
-
-@app.route('/remove_friend', methods=['POST'])
-@login_required
-def remove_friend():
-    user = get_current_user()
-    friend_username = request.form.get('friend_username')
-    friend = User.query.filter_by(username=friend_username).first()
-    
-    if friend and friend.id != user.id:
-        friendship = Friendship.query.filter(
-            ((Friendship.user_id == user.id) & (Friendship.friend_id == friend.id)) |
-            ((Friendship.user_id == friend.id) & (Friendship.friend_id == user.id))
-        ).first()
-        
-        if friendship:
-            db.session.delete(friendship)
-            db.session.commit()
-    
-    return redirect(url_for('friends'))
-
-@app.route('/api/search_user/<username>')
-@login_required
-def search_user(username):
-    user = User.query.filter_by(username=username).first()
-    current_user = get_current_user()
-    
-    if user and user != current_user:
-        friendship = Friendship.query.filter(
-            ((Friendship.user_id == current_user.id) & (Friendship.friend_id == user.id)) |
-            ((Friendship.user_id == user.id) & (Friendship.friend_id == current_user.id))
-        ).first()
-        
-        if not friendship:
-            return jsonify({
-                'found': True,
-                'username': user.username
-            })
-    
-    return jsonify({'found': False})
-
-@app.route('/api/user_profile/<username>')
-@login_required
-def get_user_profile(username):
-    user = User.query.filter_by(username=username).first()
-    
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-  
-    user_stats = get_user_stats(user.id)
-    
-    return jsonify({
-        'username': user.username,
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'stats': {
-            'total_quizzes': user_stats['total_quizzes'],
-            'average_score': user_stats['average_score'],
-            'best_category': user_stats['best_category']
-        }
-    })
 
 @app.context_processor
 def utility_processor():

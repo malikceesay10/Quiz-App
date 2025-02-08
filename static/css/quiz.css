@@ -37,18 +37,9 @@
     margin-bottom: 3rem;
 }
 
-.timer, .question-counter {
+.question-counter {
     padding: 0.8rem 1.2rem;
     border-radius: 10px;
-}
-
-.timer {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #1a73e8;
-    background: rgba(26, 115, 232, 0.1);
-    min-width: 80px;
-    text-align: center;
 }
 
 .question-counter {
