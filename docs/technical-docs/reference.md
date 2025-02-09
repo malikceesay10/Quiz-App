@@ -189,7 +189,7 @@ nav_order: 3
 
 **Purpose:** Processes individual question responses and updates practice statistics.
 
-**Sample Output:** JSON response with correctness and explanation.
+**Sample Output:** JSON response with correctness.
 
 ---
 
