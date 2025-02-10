@@ -5,6 +5,6 @@ nav_order: 2
 ---
 
 {: .label }
-[TMalik Ceesay & Yazid Heimur]
+[Malik Ceesay & Yazid Heimur]
 
 # Technical documentation
