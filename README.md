@@ -2,6 +2,7 @@
 
 Quiz Learning is an interactive learning application that allows users to enhance their knowledge through categorized quizzes while tracking their progress with visual statistics and progress bars.
 
+In addition to code, this repository includes a Github Pages Documentation: [Quiz Learning Documentation](https://malikceesay10.github.io/Quiz-App/technical-docs/architecture.html).
 
 ## Features
 
@@ -46,5 +47,3 @@ Quiz Learning is an interactive learning application that allows users to enhanc
 - **Start Quiz**: Choose a category and start a quiz.
 - **Profile**: Manage your personal information and change your password.
 - **Statistics**: Track your learning progress and analyze your results.
-
- 
